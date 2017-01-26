@@ -98,6 +98,10 @@ int account::get_number_of_envelopes() const {
 	return number_of_envelopes;
 }
 
+int account::get_id() const {
+	return id;
+}
+
 /**
  * Setters
  */

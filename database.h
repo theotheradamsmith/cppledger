@@ -18,7 +18,7 @@ class database {
 		int initialize_vault();
 		void close_database_connection();
 
-		int load_data(list<account> &acc);
+		int load_data(list<account *> &acc);
 
 		int save_data(account &acc);
 		int save_data(envelope &env, int owner_id);

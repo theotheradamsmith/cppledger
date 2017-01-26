@@ -65,8 +65,8 @@ class account : public monetary_container {
 
 	public:
 		/// Initialize a new account by providing an initial balance
-		account(string n, long b)
-			: monetary_container(n, b), total_account_balance(b) {}
+		account(string n, long b, int i)
+			: monetary_container(n, b), total_account_balance(b), id(i) {}
 		~account() {}
 
 		/**
@@ -105,6 +105,10 @@ class account : public monetary_container {
 		 * Get the number of envelopes
 		 */
 		int get_number_of_envelopes() const;
+		/**
+		 * Get the account id
+		 */
+		int get_id() const;
 
 		/**
 		 * Assign a new name to an account
@@ -130,6 +134,9 @@ class account : public monetary_container {
 	private:
 		/// Shared grand total
 		long total_account_balance = 0;
+
+		/// Unique id number
+		int id;
 
 		/// The number of unique envelopes associated with this account
 		int number_of_envelopes = 0;

@@ -73,11 +73,12 @@ int database::initialize_vault() {
 	return(rc);
 }
 
-int database::load_data(list<account> &acc_list) {
+int database::load_data(list<account *> &acc_list) {
 	sqlite3_stmt *res;
 	int rc;
 	const char *accounts_sql =
 		"SELECT "
+			"id, "
 			"name, "
 			"total_account_balance, "
 			"balance, "
@@ -93,16 +94,17 @@ int database::load_data(list<account> &acc_list) {
 	while (1) {
 		int s = sqlite3_step(res);
 		if (s == SQLITE_ROW) {
-			string row_name = (const char *)sqlite3_column_text(res, 0);
-			long row_total_account_balance = sqlite3_column_int(res, 1);
-			long row_balance = sqlite3_column_int(res, 2);
-			int row_number_of_envelopes = sqlite3_column_int(res, 3);
+			int row_id = sqlite3_column_int(res, 0);
+			string row_name = (const char *)sqlite3_column_text(res, 1);
+			long row_total_account_balance = sqlite3_column_int(res, 2);
+			long row_balance = sqlite3_column_int(res, 3);
+			int row_number_of_envelopes = sqlite3_column_int(res, 4);
 			if (DEBUG) {
 				cout << "Account " << row_name << ": " << row_total_account_balance;
 				cout << " <=> " << row_balance << " ... " << row_number_of_envelopes;
 			}
-			account new_account(row_name, row_total_account_balance);
-			new_account.set_available_balance(row_balance);
+			account *new_account = new account(row_name, row_total_account_balance, row_id);
+			new_account->set_available_balance(row_balance);
 			for (int i = 0; i < row_number_of_envelopes; ++i) {
 				cout << "push back an envelope here" << endl;
 			}
@@ -123,15 +125,51 @@ int database::load_data(list<account> &acc_list) {
 int database::save_data(account &acc) {
 	sqlite3_stmt *res;
 	int rc;
-	const char *accounts_sql = "INSERT OR UPDATE INTO accounts("
+	const char *accounts_sql =
+		//"BEGIN TRANSACTION;"
+		"UPDATE "
+			"accounts "
+		"SET "
+			"name = @nam, "
+			"total_account_balance = @tot_bal, "
+			"balance = @bal, "
+			"number_of_envelopes = @num_env "
+		"WHERE "
+			"id = @id"
+		";"
+		/*
+		"INSERT INTO "
+			"accounts( "
+				"id, "
+				"name, "
+				"total_account_balance, "
+				"balance, "
+				"number_of_envelopes"
+			") "
+		"VALUES ("
+			"@id, "
+			"@nam, "
+			"@tot_bal, "
+			"@bal, "
+			"@num_env"
+		")"
+		";"
+		"COMMIT;"
+		*/
+		;
+		/*
+		"INSERT OR UPDATE INTO accounts("
 		"name, total_account_balance, balance, number_of_envelopes)"
 		"VALUES (@nam, @tot_bal, @bal, @num_env);";
+		*/
 	if ((rc = sqlite3_prepare_v2(database_connection, accounts_sql, -1, &res, 0)) == SQLITE_OK) {
+		int id_idx = sqlite3_bind_parameter_index(res, "@id");
 		int nam_idx = sqlite3_bind_parameter_index(res, "@nam");
 		int tot_bal_idx = sqlite3_bind_parameter_index(res, "@tot_bal");
 		int bal_idx = sqlite3_bind_parameter_index(res, "@bal");
 		int num_env_idx = sqlite3_bind_parameter_index(res, "@num_env_idx");
 
+		sqlite3_bind_int(res, id_idx, acc.get_id());
 		sqlite3_bind_text(res, nam_idx, acc.get_name().c_str(), -1, SQLITE_STATIC);
 		sqlite3_bind_int(res, tot_bal_idx, acc.get_total_account_balance());
 		sqlite3_bind_int(res, bal_idx, acc.get_available_balance());
