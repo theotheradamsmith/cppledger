@@ -1,6 +1,6 @@
 #include "database.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 ostream &operator<<(ostream &out, database &database_obj) {
 	out << database_obj.get_database_connection();
@@ -58,7 +58,7 @@ int database::initialize_vault() {
 			"number_of_envelopes INTEGER,"
 			"UNIQUE(name)"
 		");"
-		"INSERT OR IGNORE INTO accounts VALUES(1, 'root_account', 0, 0, 0);"
+		"INSERT OR IGNORE INTO accounts(id, name, total_account_balance, balance, number_of_envelopes) VALUES(1, 'root_account', 0, 0, 0);"
 		"CREATE TABLE IF NOT EXISTS envelopes("
 			"id INTEGER PRIMARY KEY,"
 			"owner_account INTEGER,"
@@ -103,7 +103,7 @@ int database::load_data(list<account *> &acc_list) {
 				cout << "Account " << row_name << ": " << row_total_account_balance;
 				cout << " <=> " << row_balance << " ... " << row_number_of_envelopes;
 			}
-			account *new_account = new account(row_name, row_total_account_balance, row_id);
+			account *new_account = new account(row_name, row_total_account_balance, row_id, row_number_of_envelopes);
 			new_account->set_available_balance(row_balance);
 			for (int i = 0; i < row_number_of_envelopes; ++i) {
 				cout << "push back an envelope here" << endl;
@@ -126,19 +126,7 @@ int database::save_data(account &acc) {
 	sqlite3_stmt *res;
 	int rc;
 	const char *accounts_sql =
-		//"BEGIN TRANSACTION;"
-		"UPDATE "
-			"accounts "
-		"SET "
-			"name = @nam, "
-			"total_account_balance = @tot_bal, "
-			"balance = @bal, "
-			"number_of_envelopes = @num_env "
-		"WHERE "
-			"id = @id"
-		";"
-		/*
-		"INSERT INTO "
+		"INSERT OR REPLACE INTO "
 			"accounts( "
 				"id, "
 				"name, "
@@ -154,20 +142,13 @@ int database::save_data(account &acc) {
 			"@num_env"
 		")"
 		";"
-		"COMMIT;"
-		*/
-		;
-		/*
-		"INSERT OR UPDATE INTO accounts("
-		"name, total_account_balance, balance, number_of_envelopes)"
-		"VALUES (@nam, @tot_bal, @bal, @num_env);";
-		*/
+	;
 	if ((rc = sqlite3_prepare_v2(database_connection, accounts_sql, -1, &res, 0)) == SQLITE_OK) {
 		int id_idx = sqlite3_bind_parameter_index(res, "@id");
 		int nam_idx = sqlite3_bind_parameter_index(res, "@nam");
 		int tot_bal_idx = sqlite3_bind_parameter_index(res, "@tot_bal");
 		int bal_idx = sqlite3_bind_parameter_index(res, "@bal");
-		int num_env_idx = sqlite3_bind_parameter_index(res, "@num_env_idx");
+		int num_env_idx = sqlite3_bind_parameter_index(res, "@num_env");
 
 		sqlite3_bind_int(res, id_idx, acc.get_id());
 		sqlite3_bind_text(res, nam_idx, acc.get_name().c_str(), -1, SQLITE_STATIC);

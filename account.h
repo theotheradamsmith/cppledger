@@ -56,7 +56,6 @@ class envelope : public monetary_container {
 
 		/// The envelope's "investment category"
 		string category;
-		
 };
 
 class account : public monetary_container {
@@ -65,9 +64,8 @@ class account : public monetary_container {
 
 	public:
 		/// Initialize a new account by providing an initial balance
-		account(string n, long b, int i)
-			: monetary_container(n, b), total_account_balance(b), id(i) {}
-		~account() {}
+		account(string n, long b, int i, int e);
+		~account();
 
 		/**
 		 * Function to create envelope and push it to the account's envelopes vector
@@ -133,11 +131,11 @@ class account : public monetary_container {
 
 	private:
 		/// Shared grand total
-		long total_account_balance = 0;
+		long total_account_balance;
 
 		/// Unique id number
 		int id;
 
 		/// The number of unique envelopes associated with this account
-		int number_of_envelopes = 0;
+		int number_of_envelopes;
 };

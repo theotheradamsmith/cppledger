@@ -13,7 +13,7 @@ ostream &operator<<(ostream &out, account &acc) {
 	for (auto env : acc.envelopes) {
 		out << '\t' << env << endl;
 	}
-	
+
 	return out;
 }
 
@@ -54,6 +54,17 @@ string envelope::get_category() const {
 /**
  * Account Functions
  */
+
+account::account(string n, long b, int i, int e) :
+	monetary_container(n, b),
+	total_account_balance(b),
+	id(i),
+	number_of_envelopes(e)
+{
+}
+
+account::~account() {
+}
 
 void account::create_envelope(string n, long b, long i) {
 	envelope env(n, b, i);
