@@ -16,4 +16,7 @@ sqlite3.o: sqlite3.c
 clean:
 	rm -f $(BIN) *.o
 
+testclean: clean
+	rm -f *.db
+
 .PHONY: all, clean

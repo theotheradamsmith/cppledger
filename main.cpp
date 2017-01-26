@@ -14,15 +14,6 @@ int main(int argc, char **argv) {
 	cout << endl;
 	cout << "Welcome to your Estate. Initializing..." << endl;
 
-	int rc;
-
-	if ((rc = db->initialize_vault()) != SQLITE_OK) {
-		fprintf(stderr, "FATAL ERR: SQL error: %s\n", main_database_err_msg);
-		sqlite3_free(main_database_err_msg);
-		db->close_database_connection();
-		exit(1);
-	}
-
 	//db.load_data();
 
 	if (test_interface_loop(*db) != 0) {

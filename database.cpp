@@ -19,13 +19,21 @@ database::database(const char *n) {
 		exit(1);
 	}
 
-	// Attempt to connect to the database, saving connection in database_connection
+	sqlite3 *db;
 	int rc;
-	if ((rc = sqlite3_open(database_name, &database_connection)) != SQLITE_OK) {
-		fprintf(stderr, "ERROR: Cannot open database: %s\n", sqlite3_errmsg(database_connection));
+	if ((rc = sqlite3_open(n, &db)) != SQLITE_OK) {
+		fprintf(stderr, "FATAL: Cannot open database: %s\n", sqlite3_errmsg(db));
 		exit(1);
 	}
+	database_connection = db;
 	database_name = n;
+
+	if ((rc = initialize_vault()) != SQLITE_OK) {
+		fprintf(stderr, "FATAL ERR: SQL error: %s\n", main_database_err_msg);
+		sqlite3_free(main_database_err_msg); close_database_connection();
+		close_database_connection();
+		exit(1);
+	}
 }
 
 database::~database() {
