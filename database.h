@@ -26,6 +26,7 @@ class database {
 		vector<account> accounts;
 
 	private:
+		const char *database_name;
 		sqlite3 *database_connection;
 		char *main_database_err_msg;
 };

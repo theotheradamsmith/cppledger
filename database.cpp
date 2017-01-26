@@ -8,13 +8,24 @@ ostream &operator<<(ostream &out, database &database_obj) {
 }
 
 database::database(const char *n) {
-	sqlite3 *db;
-	int rc;
-	if ((rc = sqlite3_open(n, &db)) != SQLITE_OK) {
-		fprintf(stderr, "FATAL: Cannot open database: %s\n", sqlite3_errmsg(db));
+	/* Check to see if the proposed database file exists; if not, create it.
+	 * Exit on fatal error.
+	 */
+	FILE *fp;
+	if ((fp = fopen(n, "ab+"))) {
+		fclose(fp);
+	} else {
+		fprintf(stderr, "FATAL ERROR: Unable to open/create ROOT_DB!\n");
 		exit(1);
 	}
-	database_connection = db;
+
+	// Attempt to connect to the database, saving connection in database_connection
+	int rc;
+	if ((rc = sqlite3_open(database_name, &database_connection)) != SQLITE_OK) {
+		fprintf(stderr, "ERROR: Cannot open database: %s\n", sqlite3_errmsg(database_connection));
+		exit(1);
+	}
+	database_name = n;
 }
 
 database::~database() {
@@ -97,7 +108,8 @@ int database::load_data(list<account> &acc_list) {
 		}
 	}
 
-	const char *envelopes_sql = "";
+	//const char *envelopes_sql = "";
+	return 0;
 }
 
 int database::save_data(account &acc) {
