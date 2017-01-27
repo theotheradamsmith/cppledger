@@ -10,6 +10,7 @@ namespace Wt {
 }
 
 class Session {};
+class MenuItem;
 
 class estate : public Wt::WContainerWidget {
 	public:
@@ -17,10 +18,12 @@ class estate : public Wt::WContainerWidget {
 		void handleInternalPath(const string &internalPath);
 
 	private:
-		Wt::WStackedWidget *mainStack_;
-		Wt::WContainerWidget *links_;
+		Wt::WStackedWidget *contentsStack_;
+		Wt::WNavigationBar *navigation_;
 		Wt::WAnchor *back_to_accounts_;
 		Wt::WAnchor *envelopes_;
 
 		Session session_;
+
+		Wt::WMenuItem *addToMenu(Wt::WMenu *menu, const Wt::WString &name, MenuItem *topic);
 };

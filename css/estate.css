@@ -10,8 +10,28 @@ h1 {
 	margin: 20px 40px;
 }
 
-.links {
+.navigation {
 	margin: 10px;
 	text-align: center;
 }
 
+.contents {
+}
+
+.menu {
+	overflow: auto;
+}
+
+.menu > li > .nav-pills > .active > a,
+.menu > li > .nav-pills > .active > a:hover {
+	color: black;
+	background-color: #9CF;
+}
+
+.menu > li > .nav-pills a {
+	color: #333;
+}
+
+.submenu {
+	overflow: auto;
+}
