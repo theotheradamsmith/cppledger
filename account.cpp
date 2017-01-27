@@ -11,7 +11,7 @@ ostream &operator<<(ostream &out, account &acc) {
 	out << "Avail Balance: " << acc.balance << endl;
 	out << "\tEnvelopes (" << acc.number_of_envelopes << "):" << endl;
 	for (auto env : acc.envelopes) {
-		out << '\t' << env << endl;
+		out << '\t' << *env << endl;
 	}
 
 	return out;
@@ -31,14 +31,19 @@ long monetary_container::get_available_balance() const {
 /**
  * Envelope Functions
  */
-envelope::envelope(string nam, long bal, long inc, int id, int own) :
+int envelope::id_gen = 0;
+
+envelope::envelope(string nam, long bal, long inc, int env_id, int own) :
 	monetary_container(nam, bal),
 	increment_value(inc),
 	owner_id(own)
 {
 	id_gen++;
-	if (id == -1) {
+	if (env_id == -1) {
 		id = id_gen;
+		cout << "Creating envelope with id " << id << endl;
+	} else {
+		id = env_id;
 	}
 }
 
@@ -63,15 +68,18 @@ string envelope::get_category() const {
 	return category;
 }
 
+int envelope::get_id() const {
+	return id;
+}
+
 /**
  * Account Functions
  */
 
-account::account(string n, long b, int i, int e) :
+account::account(string n, long b, int i) :
 	monetary_container(n, b),
 	total_account_balance(b),
-	id(i),
-	number_of_envelopes(e)
+	id(i)
 {
 }
 

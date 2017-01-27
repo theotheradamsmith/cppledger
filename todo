@@ -1,0 +1,1 @@
+1) Bug where "create_envelope" on load from database is subtracting from available account balance

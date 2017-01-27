@@ -67,5 +67,5 @@ class database {
 		/**
 		 * Helper function to load information from the envelopes table
 		 */
-		int load_envelope_data(int account_id, list<envelope *> &env_list);
+		int load_envelope_data(account &acc);
 };

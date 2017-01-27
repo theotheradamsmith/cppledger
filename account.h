@@ -61,8 +61,7 @@ class envelope : public monetary_container {
 
 		int owner_id;
 
-		int id_gen = 0;
-
+		static int id_gen;
 };
 
 class account : public monetary_container {
@@ -71,7 +70,7 @@ class account : public monetary_container {
 
 	public:
 		/// Initialize a new account by providing an initial balance
-		account(string n, long b, int i, int e);
+		account(string n, long b, int i);
 		~account();
 
 		/**
@@ -146,5 +145,5 @@ class account : public monetary_container {
 		int id;
 
 		/// The number of unique envelopes associated with this account
-		int number_of_envelopes;
+		int number_of_envelopes = 0;
 };
