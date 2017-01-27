@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Run the dollars program using default values for host & port
+
+declare -gr ADDR='0.0.0.0'
+declare -gr PORT='9090'
+
+./dollars --docroot . --http-address "${ADDR}" --http-port "${PORT}"
