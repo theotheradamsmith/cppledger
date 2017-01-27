@@ -99,15 +99,18 @@ int database::load_data(list<account *> &acc_list) {
 			long row_total_account_balance = sqlite3_column_int(res, 2);
 			long row_balance = sqlite3_column_int(res, 3);
 			int row_number_of_envelopes = sqlite3_column_int(res, 4);
+
 			if (DEBUG) {
 				cout << "Account " << row_name << ": " << row_total_account_balance;
 				cout << " <=> " << row_balance << " ... " << row_number_of_envelopes;
 			}
+
+			// Create a new account, set its available balance, and load envelopes
 			account *new_account = new account(row_name, row_total_account_balance, row_id, row_number_of_envelopes);
 			new_account->set_available_balance(row_balance);
-			for (int i = 0; i < row_number_of_envelopes; ++i) {
-				cout << "push back an envelope here" << endl;
-			}
+			load_envelope_data(row_id, new_account->envelopes);
+
+			// Add the new account to the account list
 			acc_list.push_back(new_account);
 		} else if (s == SQLITE_DONE) {
 			break;
@@ -118,7 +121,56 @@ int database::load_data(list<account *> &acc_list) {
 		}
 	}
 
-	//const char *envelopes_sql = "";
+	return 0;
+}
+
+int database::load_envelope_data(int account_id, list<envelope *> &env_list) {
+	sqlite3_stmt *res;
+	int rc;
+	const char *envelopes_sql =
+		"SELECT "
+			"id, "
+			"owner_account, "
+			"name, "
+			"balance, "
+			"increment_value, "
+			"category "
+		"FROM "
+			"envelopes "
+		"WHERE "
+			"owner_account = @acc_id"
+		";"
+	;
+	if ((rc = sqlite3_prepare_v2(database_connection, envelopes_sql, -1, &res, 0)) == SQLITE_OK) {
+		int acc_idx = sqlite3_bind_parameter_index(res, "@acc_id");
+		sqlite3_bind_int(res, acc_idx, account_id);
+	} else {
+		fprintf(stderr, "Failed to execute: %s\n", sqlite3_errmsg(database_connection));
+		return -1;
+	}
+
+	while (1) {
+		int s = sqlite3_step(res);
+		if (s == SQLITE_ROW) {
+			int row_id = sqlite3_column_int(res, 0);
+			int row_owner_account = sqlite3_column_int(res, 1);
+			string row_name = (const char *)sqlite3_column_text(res, 1);
+			long row_balance = sqlite3_column_int(res, 3);
+			long row_increment_value = sqlite3_column_int(res, 4);
+			string row_category = (const char *)sqlite3_column_text(res, 5);
+
+			envelope *new_envelope = new envelope(row_name, row_balance, row_increment_value, row_id, row_owner_account);
+			env_list.push_back(new_envelope);
+
+		} else if (s == SQLITE_DONE) {
+			break;
+		} else {
+			fprintf(stderr, "Failed to read row.\n");
+			sqlite3_close(database_connection);
+			exit(1);
+		}
+	}
+
 	return 0;
 }
 

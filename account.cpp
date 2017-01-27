@@ -31,6 +31,18 @@ long monetary_container::get_available_balance() const {
 /**
  * Envelope Functions
  */
+envelope::envelope(string nam, long bal, long inc, int id, int own) :
+	monetary_container(nam, bal),
+	increment_value(inc),
+	owner_id(own)
+{
+	id_gen++;
+	if (id == -1) {
+		id = id_gen;
+	}
+}
+
+envelope::~envelope() {}
 void envelope::set_envelope_increment_value(long i) {
 	increment_value = i;
 }
@@ -66,8 +78,8 @@ account::account(string n, long b, int i, int e) :
 account::~account() {
 }
 
-void account::create_envelope(string n, long b, long i) {
-	envelope env(n, b, i);
+void account::create_envelope(string n, long b, long i, int env_id=-1) {
+	envelope *env = new envelope(n, b, i, env_id, id);
 	envelopes.push_back(env);
 	adjust_account_balance(-b);
 	number_of_envelopes++;
@@ -91,8 +103,8 @@ void account::adjust_account_balance(long v) {
 
 envelope *account::locate_envelope(string n) {
 	for (auto &env : envelopes) {
-		if (n == env.name) {
-			return &env;
+		if (n == env->name) {
+			return env;
 		}
 	}
 	return nullptr;

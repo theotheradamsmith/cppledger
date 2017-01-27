@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
+#include <list>
 
 using namespace std;
 
@@ -23,9 +23,8 @@ class monetary_container {
 class envelope : public monetary_container {
 	friend ostream &operator<<(ostream &out, envelope &env);
 	public:
-		envelope(string n, long b, long i)
-			: monetary_container(n, b), increment_value(i) {}
-		~envelope() {}
+		envelope(string nam, long bal, long inc, int id, int own);
+		~envelope();
 
 		/**
 		 * Change an envelope's increment value to specificed value
@@ -47,15 +46,23 @@ class envelope : public monetary_container {
 
 		long get_increment_value() const;
 		string get_category() const;
+		int get_id() const;
+		int get_owner_id() const;
 
 	private:
 		friend class account;
-
 		/// The amount by which to change an envelope's value
 		long increment_value = 0;
 
 		/// The envelope's "investment category"
 		string category;
+
+		int id;
+
+		int owner_id;
+
+		int id_gen = 0;
+
 };
 
 class account : public monetary_container {
@@ -72,8 +79,10 @@ class account : public monetary_container {
 		 * @param n Name for the envelope
 		 * @param b A starting balance for the account
 		 * @param i A default increment value for the account
+		 * @param env_id An id number to assign to the new envelope;
+		 *        if -1, will generate a new id;
 		 */
-		void create_envelope(string n, long b, long i);
+		void create_envelope(string n, long b, long i, int env_id);
 
 		/**
 		 * Helper function to adjust the working balance available in the account
@@ -126,8 +135,8 @@ class account : public monetary_container {
 		 */
 		void set_available_balance(long val);
 
-		/// A vector of envelopes that subdivide the account
-		vector<envelope> envelopes;
+		/// A list of envelope pointers for envelopes that subdivide the account
+		list<envelope *> envelopes;
 
 	private:
 		/// Shared grand total
