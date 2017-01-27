@@ -2,9 +2,11 @@
 #include <thread>
 
 #include <Wt/WApplication>
+#include <Wt/WHBoxLayout>
 #include <Wt/WServer>
 
 #include "account.h"
+#include "estate.h"
 #include "main.h"
 #include "database.h"
 #include "test.h"
@@ -16,14 +18,22 @@ char *main_database_err_msg = nullptr;
 Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
 	Wt::WApplication *app = new Wt::WApplication(env);
 
+	if (app->appRoot().empty()) {
+		cerr << "FATAL ERROR: unable to generate approot" << endl;
+	}
+
+	Wt::WHBoxLayout *layout = new Wt::WHBoxLayout(app->root());
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(new estate());
+
 	app->setTitle("The Estate");
 	/*
 	app->messageResourceBundle().use(app->appRoot() + "strings");
 	app->messageResourceBundle().use(app->appRoot() + "templates");
-	app->useStyleSheet("css/the_estate.css");
-
-	new estate(app->root());
 	*/
+	app->useStyleSheet("css/estate.css");
+
+	//new estate(app->root());
 
 	return app;
 }

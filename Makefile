@@ -7,7 +7,7 @@ BIN=dollars
 
 all: $(BIN)
 
-dollars: main.cpp test.cpp database.cpp account.cpp sqlite3.o
+dollars: main.cpp test.cpp database.cpp account.cpp estate.cpp sqlite3.o
 	$(CXX) $(CFLAGS) -o $@ $^ $(LIB)
 
 sqlite3.o: sqlite3.c
