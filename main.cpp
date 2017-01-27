@@ -2,6 +2,7 @@
 #include <thread>
 
 #include <Wt/WApplication>
+#include <Wt/WBootstrapTheme>
 #include <Wt/WHBoxLayout>
 #include <Wt/WServer>
 
@@ -22,6 +23,9 @@ Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
 		cerr << "FATAL ERROR: unable to generate approot" << endl;
 	}
 
+	Wt::WBootstrapTheme *bootstrapTheme = new Wt::WBootstrapTheme(app);
+	app->setTheme(bootstrapTheme);
+
 	Wt::WHBoxLayout *layout = new Wt::WHBoxLayout(app->root());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(new estate());
@@ -32,8 +36,6 @@ Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
 	app->messageResourceBundle().use(app->appRoot() + "templates");
 	*/
 	app->useStyleSheet("css/estate.css");
-
-	//new estate(app->root());
 
 	return app;
 }
