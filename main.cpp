@@ -1,3 +1,9 @@
+#include <signal.h>
+#include <thread>
+
+#include <Wt/WApplication>
+#include <Wt/WServer>
+
 #include "account.h"
 #include "main.h"
 #include "database.h"
@@ -7,6 +13,43 @@ using namespace std;
 
 char *main_database_err_msg = nullptr;
 
+Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
+	Wt::WApplication *app = new Wt::WApplication(env);
+
+	app->setTitle("The Estate");
+	/*
+	app->messageResourceBundle().use(app->appRoot() + "strings");
+	app->messageResourceBundle().use(app->appRoot() + "templates");
+	app->useStyleSheet("css/the_estate.css");
+
+	new estate(app->root());
+	*/
+
+	return app;
+}
+
+void init_server(int argc, char **argv) {
+	try {
+		Wt::WServer server(argv[0]);
+		server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
+		server.addEntryPoint(Wt::Application, createApplication);
+
+		if (server.start()) {
+			int sig = Wt::WServer::waitForShutdown(argv[0]);
+			cerr << "Shutdown (signal = " << sig << ")" << endl;
+			server.stop();
+
+			if (sig == SIGHUP) {
+				Wt::WServer::restart(argc, argv, environ);
+			}
+		}
+	} catch (Wt::WServer::Exception &e) {
+		cerr << e.what() << endl;
+	} catch (exception &e) {
+		cerr << "exception: " << e.what() << endl;
+	}
+}
+
 int main(int argc, char **argv) {
 	/* Attempt to connect to the ROOT_DB and ensure our primary vault table exists */
 	database *db = new database(ROOT_DB);
@@ -14,7 +57,8 @@ int main(int argc, char **argv) {
 	cout << endl;
 	cout << "Welcome to your Estate. Initializing..." << endl;
 
-	//db.load_data();
+	thread run_program(init_server, argc, argv);
+	run_program.detach();
 
 	if (test_interface_loop(*db) != 0) {
 		fprintf(stderr, "FATAL ERR: Interface Loop failure\n");

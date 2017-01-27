@@ -1,7 +1,7 @@
 #include "account.h"
 
 ostream &operator<<(ostream &out, envelope &env) {
-	out << env.name << ": " << env.balance;
+	out << env.id << " - " << env.name << ": " << env.balance;
 	return out;
 }
 

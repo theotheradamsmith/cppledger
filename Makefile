@@ -1,7 +1,7 @@
 CC=gcc
 CXX=g++
 
-LIB=-pthread -ldl
+LIB=-pthread -ldl -lwthttp -lwt -lboost_signals
 CFLAGS=-g -std=c++11 -Wall -O2
 BIN=dollars
 
