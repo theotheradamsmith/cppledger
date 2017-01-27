@@ -163,7 +163,7 @@ int database::load_envelope_data(account &acc) {
 
 			assert(row_owner_account == acc.get_id());
 
-			acc.create_envelope(row_name, row_balance, row_increment_value, row_id);
+			acc.create_envelope(row_name, row_balance, row_increment_value, false, row_id);
 
 		} else if (s == SQLITE_DONE) {
 			break;

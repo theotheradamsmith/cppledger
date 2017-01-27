@@ -36,7 +36,7 @@ int test_interface_loop(database &db) {
 				cin >> bal;
 				cout << "Please enter a default increment amount: ";
 				cin >> inc;
-				acc_list.front()->create_envelope(name, bal, inc, -1);
+				acc_list.front()->create_envelope(name, bal, inc);
 				break;
 			case 3:
 				cout << "Envelope name: ";

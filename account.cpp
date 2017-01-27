@@ -86,10 +86,12 @@ account::account(string n, long b, int i) :
 account::~account() {
 }
 
-void account::create_envelope(string n, long b, long i, int env_id=-1) {
+void account::create_envelope(string n, long b, long i, bool new_env, int env_id) {
 	envelope *env = new envelope(n, b, i, env_id, id);
 	envelopes.push_back(env);
-	adjust_account_balance(-b);
+	if (new_env) {
+		adjust_account_balance(-b);
+	}
 	number_of_envelopes++;
 }
 

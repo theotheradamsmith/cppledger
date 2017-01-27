@@ -81,7 +81,7 @@ class account : public monetary_container {
 		 * @param env_id An id number to assign to the new envelope;
 		 *        if -1, will generate a new id;
 		 */
-		void create_envelope(string n, long b, long i, int env_id);
+		void create_envelope(string n, long b, long i, bool new_env=true, int env_id=-1);
 
 		/**
 		 * Helper function to adjust the working balance available in the account
