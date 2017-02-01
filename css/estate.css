@@ -3,6 +3,7 @@ body {
 }
 
 h1 {
+	color: #0B486B;
 	text-align: center;
 }
 
@@ -34,4 +35,27 @@ h1 {
 
 .submenu {
 	overflow: auto;
+}
+
+.backdrop {
+	background-color: #FFF;
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+
+.blue-box {
+	background-color: #3B8686;
+	border: 2px solid #0B486B;
+	min-height: 30px;
+	color: #CFF09E;
+	text-align: center;
+	padding: 3px;
+}
+
+.green-box {
+	background-color: #DFEFE7;
+	border: 2px solid #0B486B;
+	color: #0B486B;
+	text-align: center;
+	padding: 3px;
 }
