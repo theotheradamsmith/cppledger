@@ -13,20 +13,23 @@
 #include "test.h"
 
 using namespace std;
+using namespace Wt;
 
 char *main_database_err_msg = nullptr;
 
-Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
-	Wt::WApplication *app = new Wt::WApplication(env);
+WApplication *createApplication(const WEnvironment &env) {
+	WApplication *app = new WApplication(env);
 
 	if (app->appRoot().empty()) {
 		cerr << "FATAL ERROR: unable to generate approot" << endl;
 	}
 
-	Wt::WBootstrapTheme *bootstrapTheme = new Wt::WBootstrapTheme(app);
+	/*
+	WBootstrapTheme *bootstrapTheme = new WBootstrapTheme(app);
 	app->setTheme(bootstrapTheme);
+	*/
 
-	Wt::WHBoxLayout *layout = new Wt::WHBoxLayout(app->root());
+	WHBoxLayout *layout = new WHBoxLayout(app->root());
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(new estate());
 
@@ -42,20 +45,20 @@ Wt::WApplication *createApplication(const Wt::WEnvironment &env) {
 
 void init_server(int argc, char **argv) {
 	try {
-		Wt::WServer server(argv[0]);
+		WServer server(argv[0]);
 		server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-		server.addEntryPoint(Wt::Application, createApplication);
+		server.addEntryPoint(Application, createApplication);
 
 		if (server.start()) {
-			int sig = Wt::WServer::waitForShutdown(argv[0]);
+			int sig = WServer::waitForShutdown(argv[0]);
 			cerr << "Shutdown (signal = " << sig << ")" << endl;
 			server.stop();
 
 			if (sig == SIGHUP) {
-				Wt::WServer::restart(argc, argv, environ);
+				WServer::restart(argc, argv, environ);
 			}
 		}
-	} catch (Wt::WServer::Exception &e) {
+	} catch (WServer::Exception &e) {
 		cerr << e.what() << endl;
 	} catch (exception &e) {
 		cerr << "exception: " << e.what() << endl;
