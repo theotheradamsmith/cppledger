@@ -17,7 +17,7 @@ using namespace Wt;
 
 char *main_database_err_msg = nullptr;
 
-WApplication *createApplication(const WEnvironment &env) {
+WApplication *createApplication(const WEnvironment &env, database *db) {
 	WApplication *app = new WApplication(env);
 
 	if (app->appRoot().empty()) {
@@ -31,7 +31,7 @@ WApplication *createApplication(const WEnvironment &env) {
 
 	WHBoxLayout *layout = new WHBoxLayout(app->root());
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(new estate());
+	layout->addWidget(new estate(db));
 
 	app->setTitle("The Estate");
 	/*
@@ -43,11 +43,11 @@ WApplication *createApplication(const WEnvironment &env) {
 	return app;
 }
 
-void init_server(int argc, char **argv) {
+void init_server(database *db, int argc, char **argv) {
 	try {
 		WServer server(argv[0]);
 		server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-		server.addEntryPoint(Application, createApplication);
+		server.addEntryPoint(Application, boost::bind(&createApplication, _1, db));
 
 		if (server.start()) {
 			int sig = WServer::waitForShutdown(argv[0]);
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 	cout << endl;
 	cout << "Welcome to your Estate. Initializing..." << endl;
 
-	thread run_program(init_server, argc, argv);
+	thread run_program(init_server, db, argc, argv);
 	run_program.detach();
 
 	if (test_interface_loop(*db) != 0) {

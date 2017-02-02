@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Wt/WContainerWidget>
+#include "database.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ class MenuItem;
 
 class estate : public Wt::WContainerWidget {
 	public:
-		estate();
+		estate(database *db);
 		void handleInternalPath(const string &internalPath);
 
 	private:

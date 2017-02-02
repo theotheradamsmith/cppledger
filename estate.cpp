@@ -11,10 +11,11 @@
 
 #include "estate.h"
 #include "menu_item.h"
+#include "content_box.h"
 
 using namespace Wt;
 
-estate::estate() {
+estate::estate(database *db) {
 	WText *title = new WText("<h1>Ledger of Your Estate</h1>");
 	addWidget(title);
 
@@ -38,9 +39,10 @@ estate::estate() {
 	item->setStyleClass("blue-box");
 	layout->addWidget(item, Wt::WBorderLayout::South);
 
-	item = new Wt::WText(Wt::WString(cell).arg("Center"));
-	item->setStyleClass("green-box");
-	layout->addWidget(item, Wt::WBorderLayout::Center);
+	// Create a container to hold the account information
+	WContainerWidget *content_box_container = new WContainerWidget(this);
+	content_box *cbox = new content_box(content_box_container, db);
+	layout->addWidget(content_box_container, Wt::WBorderLayout::Center);
 
 	contentsStack_ = new WStackedWidget();
 	WAnimation animation(WAnimation::Fade, WAnimation::Linear, 200);
