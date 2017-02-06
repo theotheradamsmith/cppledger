@@ -3,6 +3,7 @@
 #include <Wt/WNavigationBar>
 #include <Wt/WMenu>
 #include <Wt/WText>
+#include <Wt/WTextArea>
 #include <Wt/WStackedWidget>
 #include <Wt/WVBoxLayout>
 #include <Wt/WHBoxLayout>
@@ -15,10 +16,14 @@
 
 using namespace Wt;
 
-estate::estate(database *db) {
+estate::estate(database *db)
+	: database_connection(db)
+{
+	// Page title
 	WText *title = new WText("<h1>Ledger of Your Estate</h1>");
 	addWidget(title);
 
+	// Content background
 	WContainerWidget *container = new WContainerWidget(this);
 	container->setHeight(600);
 	container->setStyleClass("backdrop");
@@ -39,11 +44,28 @@ estate::estate(database *db) {
 	item->setStyleClass("blue-box");
 	layout->addWidget(item, Wt::WBorderLayout::South);
 
+	// Load account information from database
+	database_connection->load_data(account_list);
+
 	// Create a container to hold the account information
 	WContainerWidget *content_box_container = new WContainerWidget(this);
-	content_box *cbox = new content_box(content_box_container, db);
+	content_box *cbox = new content_box(content_box_container, database_connection, account_list.front());
 	layout->addWidget(content_box_container, Wt::WBorderLayout::Center);
 
+	WContainerWidget *nav_container = new WContainerWidget(this);
+	nav_container->setStyleClass("blue-box");
+	WStackedWidget *contents_stack = new WStackedWidget();
+	WAnimation animation(WAnimation::Fade, WAnimation::Linear, 200);
+	contents_stack->setTransitionAnimation(animation, true);
+	WMenu *menu = new WMenu(contents_stack, Vertical, nav_container);
+	menu->setStyleClass("nav nav-pills nav-stacked");
+	menu->setWidth(150);
+	menu->addItem("Accounts Overview", new WTextArea("Account overview contents"));
+	menu->addItem("Account Inspection", new WTextArea("Account Inspection contents"));
+	menu->addItem("Categories", new WTextArea("Category Management contents"));
+	layout->addWidget(nav_container, WBorderLayout::West);
+
+	/*
 	contentsStack_ = new WStackedWidget();
 	WAnimation animation(WAnimation::Fade, WAnimation::Linear, 200);
 	contentsStack_->setTransitionAnimation(animation, true);
@@ -72,6 +94,7 @@ estate::estate(database *db) {
 	layout->addWidget(nav_container, Wt::WBorderLayout::West);
 
 	WApplication::instance()->internalPathChanged().connect(this, &estate::handleInternalPath);
+	*/
 }
 
 WMenuItem *estate::addToMenu(WMenu *menu, const WString &name, MenuItem *topic) {
@@ -98,8 +121,6 @@ WMenuItem *estate::addToMenu(WMenu *menu, const WString &name, MenuItem *topic) 
 
 	subMenu->setInternalPathEnabled();
 	subMenu->setInternalBasePath("/" + item->pathComponent());
-
-	topic->populateSubMenu(subMenu);
 
 	return item;
 }
