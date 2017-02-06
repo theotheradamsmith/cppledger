@@ -1,8 +1,10 @@
 #include <list>
 #include <Wt/WHBoxLayout>
+#include <Wt/WPushButton>
 #include <Wt/WText>
 #include <Wt/WVBoxLayout>
 
+#include "account_display.h"
 #include "content_box.h"
 
 using namespace Wt;
@@ -10,33 +12,43 @@ using namespace Wt;
 content_box::content_box(WContainerWidget *parent, database *db)
 	: database_connection(db)
 {
+	// Load account data
+	database_connection->load_data(account_list);
+	account *acc = account_list.front();
+
+	// Create background container
 	WContainerWidget *container = new WContainerWidget(parent);
 	container->setStyleClass("green-box");
 
+	// Create vertical layout
 	WVBoxLayout *vbox = new WVBoxLayout();
 	container->setLayout(vbox);
 
-	db->load_data(account_list);
+	// Insert account display
+	account_display *ad = new account_display(acc, "blue-box");
+	vbox->addWidget(ad->get_display(), 1);
 
-	const char *acc_info = "<p>Account: {1}</p>"
-						   "<p>Total Balance: {2}</p>"
-						   "<p>Avail Balance: {3}</p>"
-						   "<p>Envelopes: {4}</p>";
-
-	account acc = *(account_list.front());
-	WText *item = new WText(WString(acc_info).arg(acc.get_name()).arg(std::to_string(acc.get_total_account_balance())).arg(std::to_string(acc.get_available_balance())).arg(std::to_string(acc.get_number_of_envelopes())));
-	item->setStyleClass("blue-box");
-	vbox->addWidget(item, 1);
-
+	// Create horizontal layout & place below account display
 	WHBoxLayout *hbox = new WHBoxLayout();
 	vbox->addLayout(hbox);
 
-	const char *env_info = "<p>{1} - Envelope: {2}</p>"
-						   "<p>Balance: {3}</p>";
+	for (auto env : acc->envelopes) {
+		// Create a vertical box to hold envelope display & a button
+		WVBoxLayout *env_box = new WVBoxLayout();
 
-	for (auto env : acc.envelopes) {
-		item = new WText(WString(env_info).arg(std::to_string(env->get_id())).arg(env->get_name()).arg(std::to_string(env->get_available_balance())));
-		item->setStyleClass("blue-box");
-		hbox->addWidget(item);
+		// Create envelope display & button for env
+		envelope_display *ed = new envelope_display(env, "blue-box");
+		env_box->addWidget(ed->get_display());
+		WPushButton *inc_button = new Wt::WPushButton("Increment");
+		inc_button->clicked().connect(std::bind([=] () {
+			acc->increment_envelope(env->get_name());
+			database_connection->save_data(*acc);
+			ad->refresh();
+			ed->refresh();
+		}));
+		env_box->addWidget(inc_button);
+
+		// Add vertical envelope box to horizontal layout
+		hbox->addLayout(env_box);
 	}
 }
